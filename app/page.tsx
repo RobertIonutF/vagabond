@@ -8,26 +8,27 @@ export const metadata: Metadata = {
   description: 'Experimentați arta bărbieritului la Vagabond Barbershop - unde stilul clasic întâlnește îngrijirea modernă.',
 };
 
-async function getServices() {
-  return await prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: { name: 'asc' },
-  });
-}
-
-async function getLatestTestimonials() {
-  return await prisma.testimonial.findMany({
-    take: 3,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      user: {
-        select: { name: true },
-      },
-    },
-  });
-}
-
 export default async function HomePage() {
+  async function getServices() {
+    return await prisma.service.findMany({
+      where: { isActive: true },
+      orderBy: { name: 'asc' },
+    });
+  }
+  
+  async function getLatestTestimonials() {
+    return await prisma.testimonial.findMany({
+      take: 3,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: { name: true },
+        },
+      },
+    });
+  }
+
+
   const services = await getServices();
   const testimonials = await getLatestTestimonials();
 
