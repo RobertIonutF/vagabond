@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import AppointmentForm from "./appointment-form";
-import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/server";
 import { auth } from "@/auth";
 import { CancelAppointmentDialog } from "./cancel-appointment-dialog";
 import { ClientAppointmentStatusUpdate } from "./client-appointment-status-update";
@@ -23,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Programează o ședință - Vagabond Barbershop",
@@ -98,9 +98,9 @@ export default async function AppointmentPage() {
               Pentru a programa o ședință, vă rugăm să vă autentificați.
             </p>
             <div className="mt-6">
-              <LoginLink className="btn btn-primary w-full">
-                Autentifică-te
-              </LoginLink>
+              <Link href="/auth/sign-in">
+                Autentificare
+              </Link>
             </div>
           </CardContent>
         </Card>
