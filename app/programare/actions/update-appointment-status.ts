@@ -43,6 +43,10 @@ export async function updateAppointmentStatus(appointmentId: string, newStatus: 
       throw new Error("Clientul poate doar să confirme o programare în așteptare.")
     }
 
+    if(appointment.status === "CONFIRMED" && newStatus === "CANCELLED") { 
+      throw new Error("Nu puteți anula o programare confirmată.")
+    }
+
     const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: { status: newStatus },

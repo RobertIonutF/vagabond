@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import { AppointmentStatus } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Programează o ședință - Vagabond Barbershop",
@@ -35,7 +36,7 @@ async function getUserAppointments(userId: string) {
     where: {
       userId: userId,
       status: {
-        in: ["PENDING", "CONFIRMED", "PAID"],
+        in: ["PENDING", "CONFIRMED", "PAID", "COMPLETED"],
       },
     },
     orderBy: {
@@ -98,9 +99,7 @@ export default async function AppointmentPage() {
               Pentru a programa o ședință, vă rugăm să vă autentificați.
             </p>
             <div className="mt-6">
-              <Link href="/auth/sign-in">
-                Autentificare
-              </Link>
+              <Link href="/auth/sign-in">Autentificare</Link>
             </div>
           </CardContent>
         </Card>
@@ -130,7 +129,9 @@ export default async function AppointmentPage() {
     );
   }
 
-  const appointments = await getUserAppointments(session.user.id);
+  const appointments = (await getUserAppointments(session.user.id)).filter(
+    (a) => a.status !== AppointmentStatus.COMPLETED
+  );
   const barbers = await getBarbers();
   const services = await getServices();
 
@@ -236,11 +237,13 @@ export default async function AppointmentPage() {
                           currentStatus={appointment.status}
                         />
                       </div>
-                      <div className="flex justify-end">
-                        <CancelAppointmentDialog
-                          appointmentId={appointment.id}
-                        />
-                      </div>
+                      {appointment.status !== "CONFIRMED" && (
+                        <div className="flex justify-end">
+                          <CancelAppointmentDialog
+                            appointmentId={appointment.id}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

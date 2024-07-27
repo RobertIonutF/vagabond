@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 type ClientAppointmentStatusUpdateProps = {
   appointmentId: string;
-  currentStatus: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'PAID';
+  currentStatus: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'PAID' | 'COMPLETED';
 };
 
 export function ClientAppointmentStatusUpdate({ appointmentId, currentStatus }: ClientAppointmentStatusUpdateProps) {

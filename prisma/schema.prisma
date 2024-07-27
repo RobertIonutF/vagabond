@@ -121,4 +121,5 @@ enum AppointmentStatus {
   CONFIRMED
   CANCELLED
   PAID
+  COMPLETED
 }
