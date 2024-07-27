@@ -233,7 +233,7 @@ export default async function AppointmentPage() {
             <CardTitle>Fă o nouă programare</CardTitle>
           </CardHeader>
           <CardContent>
-            {barbers.length >= 0 && (
+            {barbers.length > 0 && (
               <AppointmentForm barbers={barbers} services={services} />
             )}
             {barbers.length === 0 && (
