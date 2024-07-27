@@ -39,12 +39,12 @@ interface HomePageClientProps {
 export default function HomePageClient({ services }: HomePageClientProps) {
   return (
     <div className="min-h-screen bg-background">
-      <motion.section 
+      <motion.section
         className="container mx-auto px-4 py-24 md:py-32 flex flex-col md:flex-row items-center"
         initial="hidden"
         animate="visible"
         variants={{
-          visible: { transition: { staggerChildren: 0.2 } }
+          visible: { transition: { staggerChildren: 0.2 } },
         }}
       >
         <motion.div
@@ -67,10 +67,7 @@ export default function HomePageClient({ services }: HomePageClientProps) {
             </Link>
           </motion.div>
         </motion.div>
-        <motion.div
-          className="md:w-1/2"
-          variants={fadeInUpVariants}
-        >
+        <motion.div className="md:w-1/2" variants={fadeInUpVariants}>
           <Image
             src={heroImage}
             alt="Interiorul Vagabond Barbershop"
@@ -81,17 +78,17 @@ export default function HomePageClient({ services }: HomePageClientProps) {
         </motion.div>
       </motion.section>
 
-      <motion.section 
+      <motion.section
         className="bg-secondary text-secondary-foreground py-24"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         variants={{
-          visible: { transition: { staggerChildren: 0.2 } }
+          visible: { transition: { staggerChildren: 0.2 } },
         }}
       >
         <div className="container mx-auto px-4">
-          <motion.h2 
+          <motion.h2
             className="text-3xl md:text-4xl font-playfair mb-12 text-center"
             variants={fadeInUpVariants}
           >
@@ -122,23 +119,28 @@ export default function HomePageClient({ services }: HomePageClientProps) {
         </div>
       </motion.section>
 
-      <motion.section 
+      <motion.section
         className="py-24"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         variants={{
-          visible: { transition: { staggerChildren: 0.2 } }
+          visible: { transition: { staggerChildren: 0.2 } },
         }}
       >
         <div className="container mx-auto px-4">
-          <motion.h2 
+          <motion.h2
             className="text-3xl md:text-4xl font-playfair text-primary mb-12 text-center"
             variants={fadeInUpVariants}
           >
             Serviciile noastre
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {services.length === 0 && (
+              <p className="text-center text-foreground text-lg">
+                Momentan nu sunt servicii disponibile.
+              </p>
+            )}
             {services.map((service) => (
               <motion.div
                 key={service.id}
@@ -147,29 +149,34 @@ export default function HomePageClient({ services }: HomePageClientProps) {
                 whileHover={{ scale: 1.05 }}
               >
                 <span className="text-5xl mb-6 block">
-                  {service.name.includes("Tuns") ? "✂️" : 
-                   service.name.includes("Bărba") ? "🪒" : "💈"}
+                  {service.name.includes("Tuns")
+                    ? "✂️"
+                    : service.name.includes("Bărba")
+                    ? "🪒"
+                    : "💈"}
                 </span>
                 <h3 className="text-2xl font-bold mb-4">{service.name}</h3>
                 <p className="text-foreground text-lg">{service.price} RON</p>
-                <p className="text-foreground text-sm mt-2">{service.duration} minute</p>
+                <p className="text-foreground text-sm mt-2">
+                  {service.duration} minute
+                </p>
               </motion.div>
             ))}
           </div>
         </div>
       </motion.section>
 
-      <motion.section 
+      <motion.section
         className="py-24"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         variants={{
-          visible: { transition: { staggerChildren: 0.2 } }
+          visible: { transition: { staggerChildren: 0.2 } },
         }}
       >
         <div className="container mx-auto px-4">
-          <motion.h2 
+          <motion.h2
             className="text-3xl md:text-4xl font-playfair mb-12 text-center"
             variants={fadeInUpVariants}
           >
@@ -182,11 +189,11 @@ export default function HomePageClient({ services }: HomePageClientProps) {
                 className="bg-secondary p-8 rounded-lg shadow-lg"
                 variants={fadeInUpVariants}
               >
-                <p className="mb-6 text-lg italic">&quot;{testimonial.quote}&quot;</p>
+                <p className="mb-6 text-lg italic">
+                  &quot;{testimonial.quote}&quot;
+                </p>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-lg">
-                    {testimonial.name}
-                  </span>
+                  <span className="font-bold text-lg">{testimonial.name}</span>
                   <div className="flex">
                     {Array.from({ length: testimonial.rating }).map(
                       (_, index) => (
@@ -204,32 +211,31 @@ export default function HomePageClient({ services }: HomePageClientProps) {
         </div>
       </motion.section>
 
-      <motion.section 
+      <motion.section
         className="py-24 bg-muted"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         variants={{
-          visible: { transition: { staggerChildren: 0.2 } }
+          visible: { transition: { staggerChildren: 0.2 } },
         }}
       >
         <div className="container mx-auto px-4 text-center">
-          <motion.h2 
+          <motion.h2
             className="text-3xl md:text-4xl font-playfair text-primary mb-8"
             variants={fadeInUpVariants}
           >
             Gata să experimentezi Vagabond?
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-foreground mb-12 text-lg max-w-2xl mx-auto"
             variants={fadeInUpVariants}
           >
             Programează-te acum și descoperă diferența unui serviciu de
-            calitate. Echipa noastră te așteaptă pentru o experiență de
-            neuitat.
+            calitate. Echipa noastră te așteaptă pentru o experiență de neuitat.
           </motion.p>
-          <motion.div 
-            whileHover={{ scale: 1.05 }} 
+          <motion.div
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             variants={fadeInUpVariants}
           >
