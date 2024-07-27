@@ -6,13 +6,28 @@ import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/server";
 import { auth } from "@/auth";
 import { CancelAppointmentDialog } from "./cancel-appointment-dialog";
 import { ClientAppointmentStatusUpdate } from "./client-appointment-status-update";
-import { format } from 'date-fns';
-import { Card, CardDescription, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableFooter, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { format } from "date-fns";
+import {
+  Card,
+  CardDescription,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableFooter,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export const metadata: Metadata = {
   title: "Programează o ședință - Vagabond Barbershop",
-  description: "Programează următoarea ta ședință de îngrijire la Vagabond Barbershop.",
+  description:
+    "Programează următoarea ta ședință de îngrijire la Vagabond Barbershop.",
 };
 
 async function getUserAppointments(userId: string) {
@@ -20,24 +35,24 @@ async function getUserAppointments(userId: string) {
     where: {
       userId: userId,
       status: {
-        in: ['PENDING', 'CONFIRMED']
-      }
+        in: ["PENDING", "CONFIRMED"],
+      },
     },
     orderBy: {
-      date: 'asc'
+      date: "asc",
     },
     include: {
       barber: {
         include: {
-          user: true
-        }
+          user: true,
+        },
       },
       services: {
         include: {
-          service: true
-        }
-      }
-    }
+          service: true,
+        },
+      },
+    },
   });
 }
 
@@ -49,17 +64,17 @@ async function getBarbers() {
           id: true,
           name: true,
           image: true,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
-  return barbers.map(barber => ({
+  return barbers.map((barber) => ({
     id: barber.id,
     userId: barber.userId,
     name: barber.user.name,
     image: barber.user.image,
-    specialties: barber.specialties
+    specialties: barber.specialties,
   }));
 }
 
@@ -92,7 +107,9 @@ export default async function AppointmentPage() {
     );
   }
 
-  const isUser = session.user.roles.includes('user') && session.user.permissions.includes('create_appointment');
+  const isUser =
+    session.user.roles.includes("user") &&
+    session.user.permissions.includes("create_appointment");
 
   if (!isUser) {
     return (
@@ -103,7 +120,8 @@ export default async function AppointmentPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-lg text-center">
-              Pentru a programa o ședință, trebuie să fii autentificat ca utilizator.
+              Pentru a programa o ședință, trebuie să fii autentificat ca
+              utilizator.
             </p>
           </CardContent>
         </Card>
@@ -125,13 +143,19 @@ export default async function AppointmentPage() {
           {appointments.map((appointment) => (
             <Card key={appointment.id}>
               <CardHeader>
-                <CardTitle>Programare: {format(appointment.date, 'dd MMMM yyyy, HH:mm')}</CardTitle>
-                <CardDescription>Frizer: {appointment.barber.user.name}</CardDescription>
+                <CardTitle>
+                  Programare: {format(appointment.date, "dd MMMM yyyy, HH:mm")}
+                </CardTitle>
+                <CardDescription>
+                  Frizer: {appointment.barber.user.name}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Detalii servicii</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Detalii servicii
+                    </h3>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -141,11 +165,13 @@ export default async function AppointmentPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {appointment.services.map(s => (
+                        {appointment.services.map((s) => (
                           <TableRow key={s.service.id}>
                             <TableCell>{s.service.name}</TableCell>
                             <TableCell>{s.service.duration} min</TableCell>
-                            <TableCell className="text-right">{s.service.price.toFixed(2)} RON</TableCell>
+                            <TableCell className="text-right">
+                              {s.service.price.toFixed(2)} RON
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -153,26 +179,46 @@ export default async function AppointmentPage() {
                         <TableRow>
                           <TableCell colSpan={2}>Total</TableCell>
                           <TableCell className="text-right">
-                            {appointment.services.reduce((total, s) => total + s.service.price, 0).toFixed(2)} RON
+                            {appointment.services
+                              .reduce((total, s) => total + s.service.price, 0)
+                              .toFixed(2)}{" "}
+                            RON
                           </TableCell>
                         </TableRow>
                       </TableFooter>
                     </Table>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Rezumat programare</h3>
-                    <p><strong>Durată totală:</strong> {appointment.services.reduce((total, s) => total + s.service.duration, 0)} minute</p>
-                    <p className="mb-4"><strong>Preț total:</strong> {appointment.services.reduce((total, s) => total + s.service.price, 0).toFixed(2)} RON</p>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Rezumat programare
+                    </h3>
+                    <p>
+                      <strong>Durată totală:</strong>{" "}
+                      {appointment.services.reduce(
+                        (total, s) => total + s.service.duration,
+                        0
+                      )}{" "}
+                      minute
+                    </p>
+                    <p className="mb-4">
+                      <strong>Preț total:</strong>{" "}
+                      {appointment.services
+                        .reduce((total, s) => total + s.service.price, 0)
+                        .toFixed(2)}{" "}
+                      RON
+                    </p>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="font-semibold">Status:</span>
-                        <ClientAppointmentStatusUpdate 
-                          appointmentId={appointment.id} 
+                        <ClientAppointmentStatusUpdate
+                          appointmentId={appointment.id}
                           currentStatus={appointment.status}
                         />
                       </div>
                       <div className="flex justify-end">
-                        <CancelAppointmentDialog appointmentId={appointment.id} />
+                        <CancelAppointmentDialog
+                          appointmentId={appointment.id}
+                        />
                       </div>
                     </div>
                   </div>
@@ -187,7 +233,14 @@ export default async function AppointmentPage() {
             <CardTitle>Fă o nouă programare</CardTitle>
           </CardHeader>
           <CardContent>
-            <AppointmentForm barbers={barbers} services={services} />
+            {barbers.length >= 0 && (
+              <AppointmentForm barbers={barbers} services={services} />
+            )}
+            {barbers.length === 0 && (
+              <p className="text-lg text-center">
+                Momentan nu sunt disponibili frizeri pentru programări.
+              </p>
+            )}
           </CardContent>
         </Card>
       )}
