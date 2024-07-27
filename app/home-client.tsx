@@ -126,7 +126,7 @@ export default function HomePageClient({
                 Momentan nu sunt servicii disponibile.
               </p>
             )}
-            {services.map((service) => (
+            {services && services.length > 0 && services.map((service) => (
               <motion.div
                 key={service.id}
                 className="bg-muted p-8 rounded-lg text-center shadow-md"

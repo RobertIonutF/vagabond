@@ -25,6 +25,8 @@ export async function updateService(
     });
 
     revalidatePath("/admin/services");
+    revalidatePath("/programare")
+    revalidatePath("/")
   } catch (error) {
     console.error("Error updating service:", error);
     throw new Error("A apărut o eroare la actualizarea serviciului.");

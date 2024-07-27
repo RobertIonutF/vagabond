@@ -21,10 +21,13 @@ export async function addService(data: {
         name: data.name,
         price: data.price,
         duration: data.duration,
+        isActive: true,
       },
     });
 
     revalidatePath("/admin/services");
+    revalidatePath("/programare")
+    revalidatePath("/")
   } catch (error) {
     console.error("Error adding service:", error);
     throw new Error("A apărut o eroare la adăugarea serviciului.");
