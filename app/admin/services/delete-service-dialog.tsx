@@ -51,7 +51,7 @@ export function DeleteServiceDialog({ serviceId, serviceName, open, onOpenChange
         <DialogHeader>
           <DialogTitle>Șterge serviciul</DialogTitle>
           <DialogDescription>
-            Sunteți sigur că doriți să ștergeți serviciul "{serviceName}"? Această acțiune nu poate fi anulată.
+            Sunteți sigur că doriți să ștergeți serviciul &quot;{serviceName}&quot;? Această acțiune nu poate fi anulată.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

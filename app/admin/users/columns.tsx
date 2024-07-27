@@ -17,6 +17,40 @@ export type User = {
   isSuspended: boolean
 }
 
+const ActionsCell = ({ user }: { user: User }) => {
+  const [showChangeRoleDialog, setShowChangeRoleDialog] = useState(false)
+  const [showSuspendDialog, setShowSuspendDialog] = useState(false)
+
+  if (user.roles.includes('admin')) {
+    return <span className="text-gray-500">N/A</span>
+  }
+
+  return (
+    <div className="flex space-x-2">
+      <Button size="sm" onClick={() => setShowChangeRoleDialog(true)}>
+        Schimbă rolul
+      </Button>
+      <Button 
+        size="sm" 
+        variant={user.isSuspended ? "outline" : "destructive"}
+        onClick={() => setShowSuspendDialog(true)}
+      >
+        {user.isSuspended ? "Reactivează" : "Suspendă"}
+      </Button>
+      <ChangeRoleDialog
+        user={user}
+        open={showChangeRoleDialog}
+        onOpenChange={setShowChangeRoleDialog}
+      />
+      <SuspendUserDialog
+        user={user}
+        open={showSuspendDialog}
+        onOpenChange={setShowSuspendDialog}
+      />
+    </div>
+  )
+}
+
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "name",
@@ -67,39 +101,6 @@ export const columns: ColumnDef<User>[] = [
   {
     id: "actions",
     header: "Acțiuni",
-    cell: ({ row }) => {
-      const user = row.original
-      const [showChangeRoleDialog, setShowChangeRoleDialog] = useState(false)
-      const [showSuspendDialog, setShowSuspendDialog] = useState(false)
-
-      if (user.roles.includes('admin')) {
-        return <span className="text-gray-500">N/A</span>
-      }
-
-      return (
-        <div className="flex space-x-2">
-          <Button size="sm" onClick={() => setShowChangeRoleDialog(true)}>
-            Schimbă rolul
-          </Button>
-          <Button 
-            size="sm" 
-            variant={user.isSuspended ? "outline" : "destructive"}
-            onClick={() => setShowSuspendDialog(true)}
-          >
-            {user.isSuspended ? "Reactivează" : "Suspendă"}
-          </Button>
-          <ChangeRoleDialog
-            user={user}
-            open={showChangeRoleDialog}
-            onOpenChange={setShowChangeRoleDialog}
-          />
-          <SuspendUserDialog
-            user={user}
-            open={showSuspendDialog}
-            onOpenChange={setShowSuspendDialog}
-          />
-        </div>
-      )
-    },
+    cell: ({ row }) => <ActionsCell user={row.original} />,
   },
 ]

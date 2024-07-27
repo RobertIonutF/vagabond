@@ -178,7 +178,7 @@ export default function HomePage() {
                 className="bg-secondary p-8 rounded-lg shadow-lg"
                 variants={fadeInUpVariants}
               >
-                <p className="mb-6 text-lg italic">"{testimonial.quote}"</p>
+                <p className="mb-6 text-lg italic">&quot;{testimonial.quote}&quot;</p>
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-lg">
                     {testimonial.name}

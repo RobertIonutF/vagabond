@@ -22,6 +22,44 @@ export type Service = {
   duration: number
 }
 
+const ActionsCell = ({ service }: { service: Service }) => {
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Deschide meniu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Acțiuni</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+            Editează serviciul
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setShowDeleteDialog(true)}>
+            Șterge serviciul
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <EditServiceDialog
+        service={service}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+      />
+      <DeleteServiceDialog
+        serviceId={service.id}
+        serviceName={service.name}
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+      />
+    </>
+  )
+}
+
 export const columns: ColumnDef<Service>[] = [
   {
     accessorKey: "name",
@@ -55,43 +93,6 @@ export const columns: ColumnDef<Service>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const service = row.original
-      const [showEditDialog, setShowEditDialog] = useState(false)
-      const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
-      return (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Deschide meniu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acțiuni</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
-                Editează serviciul
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowDeleteDialog(true)}>
-                Șterge serviciul
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <EditServiceDialog
-            service={service}
-            open={showEditDialog}
-            onOpenChange={setShowEditDialog}
-          />
-          <DeleteServiceDialog
-            serviceId={service.id}
-            serviceName={service.name}
-            open={showDeleteDialog}
-            onOpenChange={setShowDeleteDialog}
-          />
-        </>
-      )
-    },
+    cell: ({ row }) => <ActionsCell service={row.original} />,
   },
 ]
