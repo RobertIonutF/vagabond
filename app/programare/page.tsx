@@ -238,7 +238,7 @@ export default async function AppointmentPage() {
             )}
             {barbers.length === 0 && (
               <p className="text-lg text-center">
-                Momentan nu sunt disponibili frizeri pentru programări.
+                Momentan nu sunt frizeri disponibili pentru programări.
               </p>
             )}
           </CardContent>
