@@ -33,7 +33,7 @@ export default function RootLayout({
   session: any;
 }>) {
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
     <html lang="ro" suppressHydrationWarning>
       <body
         className={`${playfair.variable} ${roboto.variable} ${dancingScript.variable} font-sans`}

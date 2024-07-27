@@ -1,3 +1,4 @@
+// app/middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { auth } from './auth'
@@ -11,36 +12,28 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/sign-in', request.url))
   }
 
-  if (!session.user.id) {
-    console.error('User authenticated but ID is missing')
-    return NextResponse.next()
-  }
-
-  try {
+  // Only fetch user data if needed
+  if (request.nextUrl.pathname.startsWith('/admin') || request.nextUrl.pathname.startsWith('/programare')) {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { roles: true, permissions: true }
     })
 
     if (!user) {
-      await signOut()
+      await signOut();
 
-      console.error('User not found in database')
       return NextResponse.redirect(new URL('/auth/sign-in', request.url))
-    } 
+    }
 
     const requestHeaders = new Headers(request.headers)
-    requestHeaders.set('x-user-roles', user.roles.join(','))
-    requestHeaders.set('x-user-permissions', user.permissions.join(','))
+    requestHeaders.set('x-user-roles', user?.roles.join(','))
+    requestHeaders.set('x-user-permissions', user?.permissions.join(','))
 
     return NextResponse.next({
       request: {
         headers: requestHeaders,
       },
     })
-  } catch (error) {
-    console.error('Error fetching user data:', error)
-    return NextResponse.next()
   }
 }
 

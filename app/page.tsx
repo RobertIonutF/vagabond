@@ -31,5 +31,5 @@ export default async function HomePage() {
   const services = await getServices();
   const testimonials = await getLatestTestimonials();
 
-  return <HomePageClient services={services} testimonials={testimonials as any} />;
+  return <HomePageClient services={services as any} testimonials={testimonials as any} />;
 }
