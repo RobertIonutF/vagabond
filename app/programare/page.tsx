@@ -1,4 +1,3 @@
-// app/programare/page.tsx
 import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import AppointmentForm from "./appointment-form";
@@ -6,6 +5,7 @@ import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/server";
 import { auth } from "@/auth";
 import { CancelAppointmentDialog } from "./cancel-appointment-dialog";
 import { ClientAppointmentStatusUpdate } from "./client-appointment-status-update";
+import { RatingTestimonialForm } from "./rating-testimonial-form";
 import { format } from "date-fns";
 import {
   Card,
@@ -35,7 +35,7 @@ async function getUserAppointments(userId: string) {
     where: {
       userId: userId,
       status: {
-        in: ["PENDING", "CONFIRMED"],
+        in: ["PENDING", "CONFIRMED", "PAID"],
       },
     },
     orderBy: {
@@ -52,6 +52,7 @@ async function getUserAppointments(userId: string) {
           service: true,
         },
       },
+      testimonial: true,
     },
   });
 }
@@ -187,6 +188,26 @@ export default async function AppointmentPage() {
                         </TableRow>
                       </TableFooter>
                     </Table>
+                    {appointment.status === "PAID" &&
+                      !appointment.testimonial && (
+                        <div className="mt-6">
+                          <h3 className="text-lg font-semibold mb-2">
+                            Lăsați un feedback
+                          </h3>
+                          <RatingTestimonialForm
+                            appointmentId={appointment.id}
+                          />
+                        </div>
+                      )}
+                    {appointment.testimonial && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-2">
+                          Feedback-ul dvs.
+                        </h3>
+                        <p>Rating: {appointment.testimonial.rating}/5</p>
+                        <p>Testimonial: {appointment.testimonial.content}</p>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-2">

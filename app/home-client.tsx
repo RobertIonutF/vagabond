@@ -6,26 +6,7 @@ import Link from "next/link";
 import { StarIcon } from "lucide-react";
 import heroImage from "@/public/images/hero.png";
 import { motion } from "framer-motion";
-import { Service } from "@prisma/client";
-
-const testimonials = [
-  {
-    name: "Alexandru P.",
-    quote: "Cel mai bun loc pentru un tuns și o experiență relaxantă.",
-    rating: 5,
-  },
-  {
-    name: "Mihai D.",
-    quote: "Atenția la detalii este impresionantă. Recomand cu încredere!",
-    rating: 5,
-  },
-  {
-    name: "Cristian B.",
-    quote:
-      "Atmosfera vintage și serviciile de top mă aduc înapoi de fiecare dată.",
-    rating: 5,
-  },
-];
+import { Service, Testimonial } from "@prisma/client";
 
 const fadeInUpVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -34,9 +15,13 @@ const fadeInUpVariants = {
 
 interface HomePageClientProps {
   services: Service[];
+  testimonials: (Testimonial & { user: { name: string } })[];
 }
 
-export default function HomePageClient({ services }: HomePageClientProps) {
+export default function HomePageClient({
+  services,
+  testimonials,
+}: HomePageClientProps) {
   return (
     <div className="min-h-screen bg-background">
       <motion.section
@@ -183,30 +168,38 @@ export default function HomePageClient({ services }: HomePageClientProps) {
             Ce spun clienții noștri
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                className="bg-secondary p-8 rounded-lg shadow-lg"
-                variants={fadeInUpVariants}
-              >
-                <p className="mb-6 text-lg italic">
-                  &quot;{testimonial.quote}&quot;
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-lg">{testimonial.name}</span>
-                  <div className="flex">
-                    {Array.from({ length: testimonial.rating }).map(
-                      (_, index) => (
-                        <StarIcon
-                          key={index}
-                          className="w-5 h-5 fill-current text-yellow-400"
-                        />
-                      )
-                    )}
+            {testimonials && testimonials.length === 0 && (
+              <p className="text-center text-foreground text-lg">
+                Momentan nu sunt testimoniale disponibile.
+              </p>
+            )}
+            {testimonials &&
+              testimonials.map((testimonial) => (
+                <motion.div
+                  key={testimonial.id}
+                  className="bg-secondary p-8 rounded-lg shadow-lg"
+                  variants={fadeInUpVariants}
+                >
+                  <p className="mb-6 text-lg italic">
+                    &quot;{testimonial.content}&quot;
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-lg">
+                      {testimonial.user.name}
+                    </span>
+                    <div className="flex">
+                      {Array.from({ length: testimonial.rating }).map(
+                        (_, index) => (
+                          <StarIcon
+                            key={index}
+                            className="w-5 h-5 fill-current text-yellow-400"
+                          />
+                        )
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
           </div>
         </div>
       </motion.section>

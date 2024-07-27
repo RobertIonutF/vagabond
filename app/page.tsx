@@ -15,8 +15,21 @@ async function getServices() {
   });
 }
 
+async function getLatestTestimonials() {
+  return await prisma.testimonial.findMany({
+    take: 3,
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: {
+        select: { name: true },
+      },
+    },
+  });
+}
+
 export default async function HomePage() {
   const services = await getServices();
+  const testimonials = await getLatestTestimonials();
 
-  return <HomePageClient services={services} />;
+  return <HomePageClient services={services} testimonials={testimonials as any} />;
 }
