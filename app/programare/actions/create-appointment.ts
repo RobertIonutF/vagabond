@@ -130,7 +130,7 @@ export async function createAppointment(data: z.infer<typeof appointmentSchema>)
       }
 
       if (barber.user?.phoneNumber) {
-        const smsBody = `Salut! Ai o nouă programare la Vagabond Barbershop pentru ${appointmentDateTime.toLocaleDateString()} la ora ${time} cu ${session.user.name}. Servicii: ${selectedServices.map(s => s.name).join(', ')}. Durată totală: ${totalDuration} minute, Preț total: ${totalPrice.toFixed(2)} RON, Contactați clientul la ${user?.phoneNumber}. pentru a confirma programarea.`
+        const smsBody = `Salut! Ai o nouă programare la Vagabond Barbershop pentru ${appointmentDateTime.toLocaleDateString()} la ora ${time} cu ${session.user.name}. Servicii: ${selectedServices.map(s => s.name).join(', ')}. Durată totală: ${totalDuration} minute, Preț total: ${totalPrice.toFixed(2)} RON, ${user?.phoneNumber ? `Contactează ${user.phoneNumber} pentru confirmare.` : 'Acest client nu a furnizat un număr de telefon.'}`
         await sendSMS(barber.user.phoneNumber, smsBody)
       }
     } catch (smsError) {

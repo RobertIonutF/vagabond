@@ -10,24 +10,33 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   async function getServices() {
-    return await prisma.service.findMany({
-      where: { isActive: true },
-      orderBy: { name: 'asc' },
-    });
+    try {
+      return await prisma.service.findMany({
+        where: { isActive: true },
+        orderBy: { name: 'asc' },
+      });
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      return [];
+    }
   }
   
   async function getLatestTestimonials() {
-    return await prisma.testimonial.findMany({
-      take: 3,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: {
-          select: { name: true },
+    try {
+      return await prisma.testimonial.findMany({
+        take: 3,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: {
+            select: { name: true },
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      console.error('Error fetching testimonials:', error);
+      return [];
+    }
   }
-
 
   const services = await getServices();
   const testimonials = await getLatestTestimonials();
