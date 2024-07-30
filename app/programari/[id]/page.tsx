@@ -93,7 +93,7 @@ export default async function AppointmentDetailsPage({ params }: { params: { id:
             <p className="mb-2"><strong>Frizer:</strong> {appointment.barber.user.name}</p>
             <div className="mb-2">
               <strong>Status:</strong> 
-              <AppointmentStatusUpdate appointmentId={appointment.id} currentStatus={appointment.status} />
+              <AppointmentStatusUpdate appointmentId={appointment.id} currentStatus={appointment.status as any} />
             </div>
           </CardContent>
         </Card>

@@ -43,6 +43,11 @@ export async function submitRatingAndTestimonial(
       },
     });
 
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: "COMPLETED" },
+    });
+
     revalidatePath("/");
     revalidatePath("/programare");
   } catch (error) {
