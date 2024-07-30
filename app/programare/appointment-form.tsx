@@ -60,6 +60,8 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
   const [error, setError] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
+  const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -70,24 +72,21 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
     },
   });
 
-  const selectedBarberId = form.watch('barberId');
-  const selectedDate = form.watch('date');
-
   useEffect(() => {
-    if (selectedBarberId) {
-      fetchAvailableDates(selectedBarberId, startOfMonth(new Date()))
+    if (selectedBarber?.id) {
+      fetchAvailableDates(selectedBarber?.id as string, startOfMonth(new Date()))
         .then(dates => setAvailableDates(dates))
         .catch(err => console.error('Error fetching available dates:', err));
     }
-  }, [selectedBarberId]);
+  }, [selectedBarber?.id]);
 
   useEffect(() => {
-    if (selectedBarberId && selectedDate) {
-      fetchAvailableSlots(selectedBarberId, selectedDate)
+    if (selectedBarber?.id && selectedDate) {
+      fetchAvailableSlots(selectedBarber.id, selectedDate)
         .then(slots => setAvailableSlots(slots))
         .catch(err => console.error('Error fetching available slots:', err));
     }
-  }, [selectedBarberId, selectedDate]);
+  }, [selectedBarber?.id, selectedDate]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -130,8 +129,7 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
               <FormControl>
                 <RadioGroup
                   onValueChange={(value) => {
-                    field.onChange(value);
-                    form.setValue('time', '');
+                    setSelectedBarber(barbers.find(barber => barber.userId === value) || null);
                   }}
                   defaultValue={field.value}
                   className="flex flex-wrap gap-4"
@@ -177,8 +175,7 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
                 mode="single"
                 selected={field.value}
                 onSelect={(date) => {
-                  field.onChange(date);
-                  form.setValue('time', '');
+                  setSelectedDate(date as Date);
                 }}
                 disabled={(date) =>
                   date < new Date() || 
