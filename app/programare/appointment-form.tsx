@@ -91,39 +91,6 @@ export default function AppointmentForm({
     },
   });
 
-  const selectedBarberId = form.watch("barberId");
-  const selectedDate = form.watch("date");
-
-  useEffect(() => {
-    if (selectedBarberId) {
-      startTransition(() => {
-        fetchAvailableDates(selectedBarberId, startOfMonth(new Date()))
-          .then((dates) => setAvailableDates(dates))
-          .catch((err) => {
-            console.error("Error fetching available dates:", err);
-            setError(
-              "Nu s-au putut încărca datele disponibile. Vă rugăm să încercați din nou."
-            );
-          });
-      });
-    }
-  }, [selectedBarberId]);
-
-  useEffect(() => {
-    if (selectedBarberId && selectedDate) {
-      startTransition(() => {
-        fetchAvailableSlots(selectedBarberId, selectedDate)
-          .then((slots) => setAvailableSlots(slots))
-          .catch((err) => {
-            console.error("Error fetching available slots:", err);
-            setError(
-              "Nu s-au putut încărca orele disponibile. Vă rugăm să încercați din nou."
-            );
-          });
-      });
-    }
-  }, [selectedBarberId, selectedDate]);
-
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     setIsSubmitting(true);
     setError(null);
@@ -212,11 +179,13 @@ function BarberSelection({ barbers, form }: { barbers: Barber[]; form: UseFormRe
           <FormLabel>Frizer</FormLabel>
           <FormControl>
             <RadioGroup
-              onValueChange={(value) => {
+              onValueChange={async (value) => {
                 field.onChange(value);
                 form.setValue("barberId", value);
-                form.setValue("time", "");
-                form.setValue("date", new Date());
+                
+                const barberId = value as string;
+                const selectedDate = await fetchAvailableDates(value, startOfMonth(new Date()));
+                await fetchAvailableSlots(barberId, selectedDate.find((date) => date.getDate() === new Date().getDate()) || new Date());
               }}
               defaultValue={field.value}
               className="flex flex-wrap gap-4"
