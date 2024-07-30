@@ -23,7 +23,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
           gte: startOfMonth,
           lte: endOfMonth,
         },
-        status: 'CONFIRMED',
+        status:
+        {
+            in: ['CONFIRMED', 'PAID', 'COMPLETED']
+        }
       },
     }),
     prisma.appointment.findMany({
@@ -32,7 +35,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
           gte: startOfMonth,
           lte: endOfMonth,
         },
-        status: 'PAID',
+        status:
+        {
+            in: ['CONFIRMED', 'PAID', 'COMPLETED']
+        }
       },
       include: {
         services: {

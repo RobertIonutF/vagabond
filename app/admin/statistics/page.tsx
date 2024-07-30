@@ -22,7 +22,10 @@ async function getStatistics() {
         gte: startOfMonth,
         lte: endOfMonth,
       },
-      status: 'CONFIRMED',
+      status: 
+      {
+          in: ['CONFIRMED','PAID', 'COMPLETED']
+      }
     },
   });
 
@@ -32,7 +35,10 @@ async function getStatistics() {
         gte: startOfMonth,
         lte: endOfMonth,
       },
-      status: 'PAID',
+      status: 
+      {
+        in: ['CONFIRMED', 'PAID', 'COMPLETED']
+      }
     },
     include: {
       services: {
@@ -68,7 +74,10 @@ async function getStatistics() {
             gte: startOfMonth,
             lte: endOfMonth,
           },
-          status: 'PAID',
+          status: 
+          {
+            in: ['PAID', 'COMPLETED']
+          }
         },
         include: {
           services: {
@@ -92,6 +101,8 @@ async function getStatistics() {
     })
   );
 
+  console.log(revenueData);
+
   const appointmentsData = await Promise.all(
     monthsInYear.map(async (month) => {
       const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
@@ -103,7 +114,10 @@ async function getStatistics() {
             gte: startOfMonth,
             lte: endOfMonth,
           },
-          status: "CONFIRMED"
+          status:
+          {
+              in: ['CONFIRMED' ,'PAID', 'COMPLETED']
+          }
         },
       });
 
