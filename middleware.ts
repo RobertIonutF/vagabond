@@ -4,7 +4,7 @@ import { auth } from './auth';
 
 // Define allowed paths for each role
 const ROLE_PATHS = {
-  admin: ['/admin'],
+  admin: ['/admin', '/programare', '/programari', '/profile'],
   barber: ['/programare', '/programari', '/profile'],
   user: ['/programare', '/profile'],
 };
@@ -32,5 +32,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/programare/:path*', '/profile/:path*', '/admin/:path*', '/programari/:path*'],
+  matcher: ['/programare/:path*', '/admin/:path*', '/programari/:path*'],
 };

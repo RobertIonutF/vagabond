@@ -270,7 +270,7 @@ export default async function AppointmentPage() {
                           currentStatus={appointment.status}
                         />
                       </div>
-                      {appointment.status !== "CONFIRMED" && (
+                      {appointment.status === AppointmentStatus.PENDING && (
                         <div className="flex justify-end">
                           <CancelAppointmentDialog
                             appointmentId={appointment.id}

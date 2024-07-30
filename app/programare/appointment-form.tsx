@@ -18,8 +18,17 @@ import { useToast } from "@/components/ui/use-toast";
 import { CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { startOfMonth } from 'date-fns';
-import ServiceSelection from './service-selection';
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const formSchema = z.object({
   barberId: z.string({
@@ -32,7 +41,7 @@ const formSchema = z.object({
     required_error: "Vă rugăm să selectați o oră.",
   }),
   services: z.array(z.string()).nonempty("Vă rugăm să selectați cel puțin un serviciu."),
-  extraInfo: z.string().optional(),
+  extraNote: z.string().optional(),
 });
 
 type Barber = {
@@ -62,31 +71,51 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isLoadingDates, setIsLoadingDates] = useState(false);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       services: [],
-      extraInfo: '',
+      extraNote: '',
     },
   });
 
   useEffect(() => {
     if (selectedBarber?.id) {
-      fetchAvailableDates(selectedBarber?.id as string, startOfMonth(new Date()))
+      setIsLoadingDates(true);
+      fetchAvailableDates(selectedBarber.id, startOfMonth(new Date()))
         .then(dates => setAvailableDates(dates))
-        .catch(err => console.error('Error fetching available dates:', err));
+        .catch(err => {
+          console.error('Error fetching available dates:', err);
+          toast({
+            title: "Error",
+            description: "Nu s-au putut încărca datele disponibile. Vă rugăm să încercați din nou.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => setIsLoadingDates(false));
     }
-  }, [selectedBarber?.id]);
+  }, [selectedBarber?.id, toast]);
 
   useEffect(() => {
     if (selectedBarber?.id && selectedDate) {
+      setIsLoadingSlots(true);
       fetchAvailableSlots(selectedBarber.id, selectedDate)
         .then(slots => setAvailableSlots(slots))
-        .catch(err => console.error('Error fetching available slots:', err));
+        .catch(err => {
+          console.error('Error fetching available slots:', err);
+          toast({
+            title: "Error",
+            description: "Nu s-au putut încărca intervalele orare disponibile. Vă rugăm să încercați din nou.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => setIsLoadingSlots(false));
     }
-  }, [selectedBarber?.id, selectedDate]);
+  }, [selectedBarber?.id, selectedDate, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -129,9 +158,13 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
               <FormControl>
                 <RadioGroup
                   onValueChange={(value) => {
-                    setSelectedBarber(barbers.find(barber => barber.userId === value) || null);
+                    const barber = barbers.find(b => b.userId === value);
+                    setSelectedBarber(barber || null);
+                    field.onChange(value);
+                    form.setValue('date', undefined as any);
+                    form.setValue('time', '');
                   }}
-                  defaultValue={field.value}
+                  value={field.value}
                   className="flex flex-wrap gap-4"
                 >
                   {barbers.map((barber) => (
@@ -171,23 +204,29 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Data</FormLabel>
-              <Calendar
-                mode="single"
-                selected={field.value}
-                onSelect={(date) => {
-                  setSelectedDate(date as Date);
-                }}
-                disabled={(date) =>
-                  date < new Date() || 
-                  date > new Date(new Date().setMonth(new Date().getMonth() + 1)) ||
-                  !availableDates.some(availableDate => 
-                    availableDate.getDate() === date.getDate() &&
-                    availableDate.getMonth() === date.getMonth() &&
-                    availableDate.getFullYear() === date.getFullYear()
-                  )
-                }
-                className="rounded-md border"
-              />
+              {isLoadingDates ? (
+                <p>Se încarcă datele disponibile...</p>
+              ) : (
+                <Calendar
+                  mode="single"
+                  selected={field.value}
+                  onSelect={(date) => {
+                    setSelectedDate(date as Date);
+                    field.onChange(date);
+                    form.setValue('time', '');
+                  }}
+                  disabled={(date) =>
+                    date < new Date() || 
+                    date > new Date(new Date().setMonth(new Date().getMonth() + 1)) ||
+                    !availableDates.some(availableDate => 
+                      availableDate.getDate() === date.getDate() &&
+                      availableDate.getMonth() === date.getMonth() &&
+                      availableDate.getFullYear() === date.getFullYear()
+                    )
+                  }
+                  className="rounded-md border"
+                />
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -198,20 +237,24 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
           render={({ field }) => (
             <FormItem>
               <FormLabel>Ora</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger className="bg-gray-50 dark:bg-gray-700">
-                    <SelectValue placeholder="Selectați o oră" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {availableSlots.map((slot) => (
-                    <SelectItem key={slot} value={slot}>
-                      {slot}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {isLoadingSlots ? (
+                <p>Se încarcă intervalele orare disponibile...</p>
+              ) : (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="bg-gray-50 dark:bg-gray-700">
+                      <SelectValue placeholder="Selectați o oră" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {availableSlots.map((slot) => (
+                      <SelectItem key={slot} value={slot}>
+                        {slot}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -222,22 +265,53 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
           render={({ field }) => (
             <FormItem>
               <FormLabel>Servicii</FormLabel>
-              <FormControl>
-                <ServiceSelection
-                  services={services}
-                  onSelectionChange={(selectedServices) => field.onChange(selectedServices)}
-                />
-              </FormControl>
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">Selectează</TableHead>
+                        <TableHead>Serviciu</TableHead>
+                        <TableHead>Preț</TableHead>
+                        <TableHead>Durată</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {services.map((service) => (
+                        <TableRow key={service.id}>
+                          <TableCell className="font-medium">
+                            <Checkbox
+                              checked={field.value?.includes(service.id)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([...field.value, service.id])
+                                  : field.onChange(
+                                      field.value?.filter(
+                                        (value) => value !== service.id
+                                      )
+                                    )
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell>{service.name}</TableCell>
+                          <TableCell>{service.price} RON</TableCell>
+                          <TableCell>{service.duration} minute</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="extraInfo"
+          name="extraNote"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Informații suplimentare</FormLabel>
+              <FormLabel>Notă suplimentară</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Adăugați orice informații suplimentare aici..."
