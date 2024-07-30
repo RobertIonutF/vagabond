@@ -23,7 +23,7 @@ export default function AdminSidebar() {
             const Icon = item.icon;
             return (
               <li key={item.href} className="mb-2">
-                <Link href={item.href}>
+                <Link prefetch={true} href={item.href}>
                   <span className={`flex items-center p-2 rounded-lg ${
                     pathname === item.href
                       ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
