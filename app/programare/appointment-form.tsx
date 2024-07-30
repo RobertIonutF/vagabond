@@ -129,7 +129,7 @@ export default function AppointmentForm({
           </Alert>
         )}
         <Suspense fallback={<div>Se încarcă frizerii...</div>}>
-          <BarberSelection barbers={barbers} form={form} />
+          <BarberSelection barbers={barbers} form={form} setAvailableDates={setAvailableDates} setAvailableSlots={setAvailableSlots} />
         </Suspense>
         <Suspense fallback={<div>Se încarcă calendarul...</div>}>
           <DateSelection form={form} availableDates={availableDates} />
@@ -169,7 +169,7 @@ export default function AppointmentForm({
   );
 }
 
-function BarberSelection({ barbers, form }: { barbers: Barber[]; form: UseFormReturn<FormValues> }) {
+function BarberSelection({ barbers, form, setAvailableDates, setAvailableSlots }: { barbers: Barber[]; form: UseFormReturn<FormValues>, setAvailableDates: (dates: Date[]) => void, setAvailableSlots: (slots: string[]) => void }) {
   return (
     <FormField
       control={form.control}
@@ -186,6 +186,8 @@ function BarberSelection({ barbers, form }: { barbers: Barber[]; form: UseFormRe
                 const barberId = value as string;
                 const selectedDate = await fetchAvailableDates(value, startOfMonth(new Date()));
                 await fetchAvailableSlots(barberId, selectedDate.find((date) => date.getDate() === new Date().getDate()) || new Date());
+                setAvailableDates(selectedDate);
+                setAvailableSlots(await fetchAvailableSlots(barberId, selectedDate.find((date) => date.getDate() === new Date().getDate()) || new Date()));
               }}
               defaultValue={field.value}
               className="flex flex-wrap gap-4"
