@@ -1,33 +1,11 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import { DataTable } from './data-table';
 import { columns } from './columns';
-import { getServices, ServiceWithDetails } from './actions/get-services';
+import { Service } from '@prisma/client';
 
-export default function ServicesTable() {
-  const [services, setServices] = useState<ServiceWithDetails[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+type ServiceTableProps = {
+  services: Service[];
+}
 
-  useEffect(() => {
-    async function fetchServices() {
-      try {
-        const fetchedServices = await getServices();
-        setServices(fetchedServices);
-      } catch (error) {
-        console.error('Failed to fetch services:', error);
-        // Handle error (e.g., show error message)
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchServices();
-  }, []);
-
-  if (isLoading) {
-    return <div>Loading services...</div>;
-  }
-
+export default function ServicesTable({ services }: ServiceTableProps) {
   return <DataTable columns={columns} data={services} />;
 }

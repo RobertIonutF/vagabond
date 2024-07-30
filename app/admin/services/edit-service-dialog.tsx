@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { updateService } from "./actions/update-service"
 import { useToast } from "@/components/ui/use-toast"
-import { ServiceWithDetails } from "./actions/get-services"
+import { Service } from "@prisma/client"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -40,7 +40,7 @@ const formSchema = z.object({
 })
 
 interface EditServiceDialogProps {
-  service: ServiceWithDetails
+  service: Service
   open: boolean
   onOpenChange: (open: boolean) => void
 }
