@@ -16,7 +16,7 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="bg-white dark:bg-gray-800 w-64 min-h-screen p-4">
+    <aside className="border-r p-4">
       <nav className="mt-8">
         <ul>
           {navItems.map((item) => {
