@@ -1,4 +1,3 @@
-// app/admin/services/columns.tsx
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
@@ -14,15 +13,9 @@ import {
 import { EditServiceDialog } from "./edit-service-dialog"
 import { DeleteServiceDialog } from "./delete-service-dialog"
 import { useState } from "react"
+import { ServiceWithDetails } from "./actions/get-services"
 
-export type Service = {
-  id: string
-  name: string
-  price: number
-  duration: number
-}
-
-const ActionsCell = ({ service }: { service: Service }) => {
+const ActionsCell = ({ service }: { service: ServiceWithDetails }) => {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -60,7 +53,7 @@ const ActionsCell = ({ service }: { service: Service }) => {
   )
 }
 
-export const columns: ColumnDef<Service>[] = [
+export const columns: ColumnDef<ServiceWithDetails>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -90,6 +83,14 @@ export const columns: ColumnDef<Service>[] = [
   {
     accessorKey: "duration",
     header: "Durată (minute)",
+  },
+  {
+    accessorKey: "isActive",
+    header: "Status",
+    cell: ({ row }) => {
+      const isActive = row.getValue("isActive")
+      return <div>{isActive ? "Activ" : "Inactiv"}</div>
+    },
   },
   {
     id: "actions",

@@ -1,38 +1,43 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { auth } from './auth';
-import prisma from './lib/prisma';
+
+// Define allowed paths for each role
+const ROLE_PATHS = {
+  admin: ['/admin'],
+  barber: ['/programare', '/programari', '/profile'],
+  user: ['/programare', '/profile'],
+};
 
 export async function middleware(request: NextRequest) {
   const session = await auth();
 
+  // Redirect to sign-in if no session
   if (!session?.user) {
     return NextResponse.redirect(new URL('/auth/sign-in', request.url));
   }
 
   const { pathname } = request.nextUrl;
-  if (pathname.startsWith('/admin') || pathname.startsWith('/programare')) {
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { roles: true, permissions: true },
-    });
 
-    if (!user) {
-      return NextResponse.redirect(new URL('/auth/sign-in', request.url));
-    }
+  // Check if user has permission to access the path
+  const hasPermission = session.user.roles.some(role => 
+    ROLE_PATHS[role as keyof typeof ROLE_PATHS]?.some(path => pathname.startsWith(path))
+  );
 
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-user-roles', user.roles.join(','));
-    requestHeaders.set('x-user-permissions', user.permissions.join(','));
-
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
+  if (!hasPermission) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
-  return NextResponse.next();
+  // Set user roles and permissions in headers
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-user-roles', session.user.roles.join(','));
+  requestHeaders.set('x-user-permissions', session.user.permissions.join(','));
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 export const config = {

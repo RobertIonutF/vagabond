@@ -1,7 +1,8 @@
 import { Metadata } from "next";
-import prisma from "@/lib/prisma";
-import AppointmentForm from "./appointment-form";
 import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import AppointmentForm from "./appointment-form";
 import { CancelAppointmentDialog } from "./cancel-appointment-dialog";
 import { ClientAppointmentStatusUpdate } from "./client-appointment-status-update";
 import { RatingTestimonialForm } from "./rating-testimonial-form";
@@ -23,15 +24,40 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import { AppointmentStatus } from "@prisma/client";
+import { AppointmentStatus, Prisma } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Programează o ședință - Vagabond Barbershop",
-  description:
-    "Programează următoarea ta ședință de îngrijire la Vagabond Barbershop.",
+  description: "Programează următoarea ta ședință de îngrijire la Vagabond Barbershop.",
 };
 
-async function getUserAppointments(userId: string) {
+type AppointmentWithRelations = Prisma.AppointmentGetPayload<{
+  include: {
+    barber: {
+      include: {
+        user: true;
+      };
+    };
+    services: {
+      include: {
+        service: true;
+      };
+    };
+    testimonial: true;
+  };
+}>;
+
+type Barber = {
+  id: string;
+  userId: string;
+  name: string | null;
+  image: string | null;
+  specialties: string[];
+};
+
+type Service = Prisma.ServiceGetPayload<{}>;
+
+async function getUserAppointments(userId: string): Promise<AppointmentWithRelations[]> {
   return await prisma.appointment.findMany({
     where: {
       userId: userId,
@@ -58,7 +84,7 @@ async function getUserAppointments(userId: string) {
   });
 }
 
-async function getBarbers() {
+async function getBarbers(): Promise<Barber[]> {
   const barbers = await prisma.barber.findMany({
     include: {
       user: {
@@ -80,8 +106,11 @@ async function getBarbers() {
   }));
 }
 
-async function getServices() {
-  return await prisma.service.findMany();
+async function getServices(): Promise<Service[]> {
+  return await prisma.service.findMany({
+    where: { isActive: true },
+    orderBy: { name: 'asc' },
+  });
 }
 
 export default async function AppointmentPage() {
@@ -98,8 +127,8 @@ export default async function AppointmentPage() {
             <p className="text-lg text-center">
               Pentru a programa o ședință, vă rugăm să vă autentificați.
             </p>
-            <div className="mt-6">
-              <Link href="/auth/sign-in">Autentificare</Link>
+            <div className="mt-6 text-center">
+              <Link href="/auth/sign-in" className="text-blue-600 hover:underline">Autentificare</Link>
             </div>
           </CardContent>
         </Card>
@@ -129,20 +158,24 @@ export default async function AppointmentPage() {
     );
   }
 
-  const appointments = (await getUserAppointments(session.user.id)).filter(
+  const [appointments, barbers, services] = await Promise.all([
+    getUserAppointments(session.user.id),
+    getBarbers(),
+    getServices(),
+  ]);
+
+  const activeAppointments = appointments.filter(
     (a) => a.status !== AppointmentStatus.COMPLETED
   );
-  const barbers = await getBarbers();
-  const services = await getServices();
 
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl sm:text-4xl font-playfair text-primary mb-8 text-center">
         Programează o ședință
       </h1>
-      {appointments.length > 0 ? (
+      {activeAppointments.length > 0 ? (
         <div className="space-y-6">
-          {appointments.map((appointment) => (
+          {activeAppointments.map((appointment) => (
             <Card key={appointment.id}>
               <CardHeader>
                 <CardTitle>
@@ -231,7 +264,7 @@ export default async function AppointmentPage() {
                     </p>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold">Status:</span>
+                        <span className="font-semibold">Status: {appointment.status}</span>
                         <ClientAppointmentStatusUpdate
                           appointmentId={appointment.id}
                           currentStatus={appointment.status}
@@ -257,10 +290,9 @@ export default async function AppointmentPage() {
             <CardTitle>Fă o nouă programare</CardTitle>
           </CardHeader>
           <CardContent>
-            {barbers.length > 0 && (
+            {barbers.length > 0 ? (
               <AppointmentForm barbers={barbers} services={services} />
-            )}
-            {barbers.length === 0 && (
+            ) : (
               <p className="text-lg text-center">
                 Momentan nu sunt frizeri disponibili pentru programări.
               </p>
