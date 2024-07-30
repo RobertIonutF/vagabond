@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RevenueChart } from './revenue-chart';
 import { AppointmentsChart } from './appointments-chart';
 import { startOfYear, endOfYear, eachMonthOfInterval, format } from 'date-fns';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Statistici - Vagabond Barbershop',
@@ -140,6 +141,7 @@ export default async function AdminStatistics() {
   const stats = await getStatistics();
 
   return (
+    <Suspense fallback={<div>Se incarca...</div>}>
     <div>
       <h1 className="text-3xl font-bold mb-6">Statistici</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -205,5 +207,6 @@ export default async function AdminStatistics() {
         </Card>
       </div>
     </div>
+    </Suspense>
   );
 }
