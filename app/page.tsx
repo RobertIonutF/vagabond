@@ -42,8 +42,7 @@ const getServices = cache(async () => {
 
 const getLatestTestimonials = cache(async () => {
   try {
-    return await prisma.testimonial.findMany({
-      take: 3,
+    const testimonials = await prisma.testimonial.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
         user: {
@@ -51,6 +50,19 @@ const getLatestTestimonials = cache(async () => {
         },
       },
     });
+
+    const uniqueTestimonials = [];
+    const userIds = new Set();
+
+    for (const testimonial of testimonials) {
+      if (!userIds.has(testimonial.userId)) {
+        uniqueTestimonials.push(testimonial);
+        userIds.add(testimonial.userId);
+      }
+      if (uniqueTestimonials.length >= 3) break;
+    }
+
+    return uniqueTestimonials;
   } catch (error) {
     console.error('Error fetching testimonials:', error);
     return [];
