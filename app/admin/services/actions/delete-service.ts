@@ -17,6 +17,8 @@ export async function deleteService(id: string) {
       })
   
       revalidatePath("/admin/services")
+      revalidatePath("/")
+      revalidatePath("/programare")
     } catch (error) {
       console.error("Error deleting service:", error)
       throw new Error("A apărut o eroare la ștergerea serviciului.")
