@@ -13,9 +13,9 @@ import {
 import { EditServiceDialog } from "./edit-service-dialog"
 import { DeleteServiceDialog } from "./delete-service-dialog"
 import { useState } from "react"
-import { ServiceWithDetails } from "./actions/get-services"
+import { Service } from "@prisma/client"
 
-const ActionsCell = ({ service }: { service: ServiceWithDetails }) => {
+const ActionsCell = ({ service }: { service: Service }) => {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -39,7 +39,7 @@ const ActionsCell = ({ service }: { service: ServiceWithDetails }) => {
         </DropdownMenuContent>
       </DropdownMenu>
       <EditServiceDialog
-        service={service}
+        service={service as Service}
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
       />
@@ -53,7 +53,7 @@ const ActionsCell = ({ service }: { service: ServiceWithDetails }) => {
   )
 }
 
-export const columns: ColumnDef<ServiceWithDetails>[] = [
+export const columns: ColumnDef<Service>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {

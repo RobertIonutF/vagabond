@@ -1,5 +1,3 @@
-'use client';
-
 import { DataTable } from './data-table';
 import { columns } from './columns';
 import { User } from '@prisma/client';
