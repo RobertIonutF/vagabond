@@ -101,8 +101,6 @@ async function getStatistics() {
     })
   );
 
-  console.log(revenueData);
-
   const appointmentsData = await Promise.all(
     monthsInYear.map(async (month) => {
       const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
