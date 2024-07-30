@@ -28,16 +28,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // Set user roles and permissions in headers
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-user-roles', session.user.roles.join(','));
-  requestHeaders.set('x-user-permissions', session.user.permissions.join(','));
-
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return NextResponse.next();
 }
 
 export const config = {
