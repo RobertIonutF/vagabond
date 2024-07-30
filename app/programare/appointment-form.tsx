@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,9 @@ export default function AppointmentForm({
           .then((dates) => setAvailableDates(dates))
           .catch((err) => {
             console.error("Error fetching available dates:", err);
-            setError("Nu s-au putut încărca datele disponibile. Vă rugăm să încercați din nou.");
+            setError(
+              "Nu s-au putut încărca datele disponibile. Vă rugăm să încercați din nou."
+            );
           });
       });
     }
@@ -114,7 +116,9 @@ export default function AppointmentForm({
           .then((slots) => setAvailableSlots(slots))
           .catch((err) => {
             console.error("Error fetching available slots:", err);
-            setError("Nu s-au putut încărca orele disponibile. Vă rugăm să încercați din nou.");
+            setError(
+              "Nu s-au putut încărca orele disponibile. Vă rugăm să încercați din nou."
+            );
           });
       });
     }
@@ -125,18 +129,25 @@ export default function AppointmentForm({
     setError(null);
     try {
       const result = await createAppointment(values);
-      if ('success' in result && result.success) {
+      if ("success" in result && result.success) {
         toast({
           title: "Programare creată cu succes",
           description: "Programarea ta a fost înregistrată.",
         });
         form.reset();
       } else {
-        throw new Error(result.appointment.id || "A apărut o eroare la crearea programării. Vă rugăm să încercați din nou.");
+        throw new Error(
+          result.appointment.id ||
+            "A apărut o eroare la crearea programării. Vă rugăm să încercați din nou."
+        );
       }
     } catch (error) {
       console.error("Error creating appointment:", error);
-      setError(error instanceof Error ? error.message : "A apărut o eroare la crearea programării. Vă rugăm să încercați din nou.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "A apărut o eroare la crearea programării. Vă rugăm să încercați din nou."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -191,7 +202,7 @@ export default function AppointmentForm({
   );
 }
 
-function BarberSelection({ barbers, form } : { barbers: Barber[], form: any }) {
+function BarberSelection({ barbers, form }: { barbers: Barber[]; form: UseFormReturn<FormValues> }) {
   return (
     <FormField
       control={form.control}
@@ -203,7 +214,9 @@ function BarberSelection({ barbers, form } : { barbers: Barber[], form: any }) {
             <RadioGroup
               onValueChange={(value) => {
                 field.onChange(value);
+                form.setValue("barberId", value);
                 form.setValue("time", "");
+                form.setValue("date", new Date());
               }}
               defaultValue={field.value}
               className="flex flex-wrap gap-4"
@@ -254,7 +267,13 @@ function BarberSelection({ barbers, form } : { barbers: Barber[], form: any }) {
   );
 }
 
-function DateSelection({ form, availableDates } : { form: any, availableDates: Date[] }) {
+function DateSelection({
+  form,
+  availableDates,
+}: {
+  form: any;
+  availableDates: Date[];
+}) {
   const maxDate = addMonths(new Date(), 1);
 
   return (
@@ -290,7 +309,13 @@ function DateSelection({ form, availableDates } : { form: any, availableDates: D
   );
 }
 
-function TimeSelection({ form, availableSlots } : { form: any, availableSlots: string[] }) {
+function TimeSelection({
+  form,
+  availableSlots,
+}: {
+  form: any;
+  availableSlots: string[];
+}) {
   return (
     <FormField
       control={form.control}
@@ -319,7 +344,13 @@ function TimeSelection({ form, availableSlots } : { form: any, availableSlots: s
   );
 }
 
-function ServiceSelectionWrapper({ services, form } : { services: Service[], form: any }) {
+function ServiceSelectionWrapper({
+  services,
+  form,
+}: {
+  services: Service[];
+  form: any;
+}) {
   return (
     <FormField
       control={form.control}
