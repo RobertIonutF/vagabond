@@ -3,6 +3,7 @@
 
 import { startOfDay, endOfDay, eachHourOfInterval, format, isEqual, addMinutes } from 'date-fns'
 import prisma from "@/lib/prisma"
+import { revalidatePath } from 'next/cache'
 
 export async function fetchAvailableSlots(barberId: string, selectedDate: Date) {
   const dayStart = startOfDay(selectedDate)
@@ -39,5 +40,6 @@ export async function fetchAvailableSlots(barberId: string, selectedDate: Date) 
     )
   )
 
+  revalidatePath('/programare')
   return availableSlots.map(slot => format(slot, 'HH:mm'))
 }

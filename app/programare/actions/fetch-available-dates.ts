@@ -3,6 +3,7 @@
 
 import { startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns'
 import prisma from "@/lib/prisma"
+import { revalidatePath } from 'next/cache'
 
 export async function fetchAvailableDates(barberId: string, month: Date) {
   const monthStart = startOfMonth(month)
@@ -39,5 +40,7 @@ export async function fetchAvailableDates(barberId: string, month: Date) {
     .filter(day => day.count < 8)
     .map(day => day.date)
 
+
+  revalidatePath('/programare')
   return availableDates
 }

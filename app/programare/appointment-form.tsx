@@ -69,7 +69,6 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
   const [error, setError] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
-  const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isLoadingDates, setIsLoadingDates] = useState(false);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
@@ -82,40 +81,6 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
       extraNote: '',
     },
   });
-
-  useEffect(() => {
-    if (selectedBarber?.id) {
-      setIsLoadingDates(true);
-      fetchAvailableDates(selectedBarber.id, startOfMonth(new Date()))
-        .then(dates => setAvailableDates(dates))
-        .catch(err => {
-          console.error('Error fetching available dates:', err);
-          toast({
-            title: "Error",
-            description: "Nu s-au putut încărca datele disponibile. Vă rugăm să încercați din nou.",
-            variant: "destructive",
-          });
-        })
-        .finally(() => setIsLoadingDates(false));
-    }
-  }, [selectedBarber?.id, toast]);
-
-  useEffect(() => {
-    if (selectedBarber?.id && selectedDate) {
-      setIsLoadingSlots(true);
-      fetchAvailableSlots(selectedBarber.id, selectedDate)
-        .then(slots => setAvailableSlots(slots))
-        .catch(err => {
-          console.error('Error fetching available slots:', err);
-          toast({
-            title: "Error",
-            description: "Nu s-au putut încărca intervalele orare disponibile. Vă rugăm să încercați din nou.",
-            variant: "destructive",
-          });
-        })
-        .finally(() => setIsLoadingSlots(false));
-    }
-  }, [selectedBarber?.id, selectedDate, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -157,12 +122,16 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
               <FormLabel>Frizer</FormLabel>
               <FormControl>
                 <RadioGroup
-                  onValueChange={(value) => {
+                  onValueChange={async (value) => {
                     const barber = barbers.find(b => b.userId === value);
-                    setSelectedBarber(barber || null);
                     field.onChange(value);
                     form.setValue('date', undefined as any);
                     form.setValue('time', '');
+
+                    const dates = await fetchAvailableDates(barbers.find(b => b.userId === value)?.id || '', new Date());
+                    setAvailableDates(dates);
+
+                    setIsLoadingDates(false);
                   }}
                   value={field.value}
                   className="flex flex-wrap gap-4"
@@ -210,10 +179,13 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
                 <Calendar
                   mode="single"
                   selected={field.value}
-                  onSelect={(date) => {
+                  onSelect={async (date) => {
                     setSelectedDate(date as Date);
                     field.onChange(date);
                     form.setValue('time', '');
+                    
+                    const slots = await fetchAvailableSlots(form.getValues('barberId'), date as Date)
+                    setAvailableSlots(slots);
                   }}
                   disabled={(date) =>
                     date < new Date() || 
@@ -240,7 +212,10 @@ export default function AppointmentForm({ barbers, services }: AppointmentFormPr
               {isLoadingSlots ? (
                 <p>Se încarcă intervalele orare disponibile...</p>
               ) : (
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select onValueChange={(slot) => {
+                  console.log(slot);
+                  field.onChange(slot);
+                }} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="bg-gray-50 dark:bg-gray-700">
                       <SelectValue placeholder="Selectați o oră" />
