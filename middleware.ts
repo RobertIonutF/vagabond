@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { auth } from './auth';
 
+// In-memory cache for user sessions
+const sessionCache = new Map<string, { session: any, expires: Date }>();
+
 const ROLE_PATHS = new Map<string, Set<string>>([
   ['admin', new Set(['/admin', '/programare', '/programari', '/profile'])],
   ['barber', new Set(['/programare', '/programari', '/profile'])],
@@ -9,7 +12,24 @@ const ROLE_PATHS = new Map<string, Set<string>>([
 ]);
 
 export async function middleware(request: NextRequest) {
-  const session = await auth();
+  const sessionId = request.cookies.get('sessionId')?.value;
+
+  let session;
+  if (sessionId && sessionCache.has(sessionId)) {
+    const cached = sessionCache.get(sessionId);
+    if (cached && new Date() < new Date(cached.expires)) {
+      session = cached.session;
+    } else {
+      sessionCache.delete(sessionId);
+    }
+  }
+
+  if (!session) {
+    session = await auth();
+    if (sessionId) {
+      sessionCache.set(sessionId, { session, expires: new Date(session?.expires as string) });
+    }
+  }
 
   // Redirect to sign-in if no session
   if (!session?.user) {
@@ -19,7 +39,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if user has permission to access the path
-  const hasPermission = session.user.roles.some(role => {
+  const hasPermission = session.user.roles.some((role: string) => {
     const allowedPaths = ROLE_PATHS.get(role);
     return allowedPaths && Array.from(allowedPaths).some(path => pathname.startsWith(path));
   });
