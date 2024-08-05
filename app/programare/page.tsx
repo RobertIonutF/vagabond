@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { redirect } from "next/navigation";
 import AppointmentForm from "./appointment-form";
 import { CancelAppointmentDialog } from "./cancel-appointment-dialog";
 import { ClientAppointmentStatusUpdate } from "./client-appointment-status-update";
