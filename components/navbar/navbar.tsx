@@ -62,7 +62,6 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={true}
               className={`hover:text-burnt-orange transition-colors ${
                 pathname === item.href ? "text-burnt-orange" : ""
               }`}
@@ -73,7 +72,6 @@ export default function Navbar() {
           {isBarber && (
             <Link
               href="/programari"
-              prefetch={true}
               className={`hover:text-burnt-orange transition-colors ${
                 pathname === "/programari" ? "text-burnt-orange" : ""
               }`}
@@ -84,7 +82,6 @@ export default function Navbar() {
           {isAdmin && (
             <Link
               href="/admin"
-              prefetch={true}
               className={`hover:text-burnt-orange transition-colors ${
                 pathname.startsWith("/admin") ? "text-burnt-orange" : ""
               }`}
@@ -130,10 +127,10 @@ export default function Navbar() {
             </DropdownMenu>
           ) : (
             <>
-              <Link prefetch={true} href="/auth/sign-up" className="btn btn-primary">
+              <Link href="/auth/sign-up" className="btn btn-primary">
                 Înregistrare
               </Link>
-              <Link prefetch={true} href="/auth/sign-in" className="btn btn-secondary">
+              <Link href="/auth/sign-in" className="btn btn-secondary">
                 Autentificare
               </Link>
             </>
@@ -161,7 +158,6 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={true}
               className={`block py-2 px-6 hover:bg-leather-brown hover:text-primary-foreground transition-colors ${
                 pathname === item.href
                   ? "bg-leather-brown text-primary-foreground"
@@ -175,7 +171,6 @@ export default function Navbar() {
           {isBarber && (
             <Link
               href="/programari"
-              prefetch={true}
               className={`block py-2 px-6 hover:bg-leather-brown hover:text-primary-foreground transition-colors ${
                 pathname === "/programari"
                   ? "bg-leather-brown text-primary-foreground"
@@ -189,7 +184,6 @@ export default function Navbar() {
           {isAdmin && (
             <Link
               href="/admin"
-              prefetch={true}
               className={`block py-2 px-6 hover:bg-leather-brown hover:text-primary-foreground transition-colors ${
                 pathname.startsWith("/admin")
                   ? "bg-leather-brown text-primary-foreground"
@@ -204,7 +198,6 @@ export default function Navbar() {
             <>
               <Link
                 href="/profile/settings"
-                prefetch={true}
                 className="block py-2 px-6 hover:bg-leather-brown hover:text-primary-foreground transition-colors"
               >
                 Profil
@@ -220,14 +213,12 @@ export default function Navbar() {
             <>
               <Link
                 href="/auth/sign-up"
-                prefetch={true}
                 className="block py-2 px-6 bg-burnt-orange text-white hover:bg-mustard-yellow transition-colors"
               >
                 Înregistrare
               </Link>
               <Link
                 href="/auth/sign-in"
-                prefetch={true}
                 className="block py-2 px-6 hover:bg-leather-brown hover:text-primary-foreground transition-colors"
               >
                 Autentificare
