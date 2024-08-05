@@ -6,6 +6,8 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/toaster";
 
+export const revalidate = 30;
+
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
@@ -33,7 +35,7 @@ export default function RootLayout({
   session: any;
 }>) {
   return (
-    <SessionProvider session={session}>
+    <SessionProvider>
     <html lang="ro" suppressHydrationWarning>
       <body
         className={`${playfair.variable} ${roboto.variable} ${dancingScript.variable} font-sans`}
